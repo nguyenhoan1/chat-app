@@ -40,12 +40,12 @@ lib/
 
 1. Clone the repository:
    ```
-   git clone https://github.com/yourusername/your-project-name.git
+   git clone https://github.com/bagussubagja/flutter-clean-architecture-bloc-template.git
    ```
 
 2. Navigate to the project directory:
    ```
-   cd your-project-name
+   cd flutter-clean-architecture-bloc-template
    ```
 
 3. Install dependencies:
