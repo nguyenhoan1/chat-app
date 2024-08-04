@@ -1,0 +1,55 @@
+name: flutter_clean_architecture_bloc_template
+description: "Flutter Clean Architecture with BLoC State Management"
+
+publish_to: 'none'
+version: 1.0.0+2024081701
+
+environment:
+  sdk: '>=3.3.3 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.6
+  flutter_bloc: ^8.1.6
+  bloc: ^8.1.4
+  dio: ^5.5.0+1
+  get_it: ^7.6.0
+  equatable: ^2.0.5
+  cached_network_image: ^3.3.1
+  page_transition: ^2.1.0
+  responsive_sizer: ^3.3.1
+  shared_preferences: ^2.2.3
+  package_info_plus: ^8.0.0
+  flutter_localization: ^0.2.0
+  smart_snackbars: ^1.0.0
+  flutter_local_notifications: ^17.0.1
+  flutter_timezone: ^1.0.8
+  rxdart: ^0.27.7
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+      - assets/images/
+      - assets/fonts/
+
+  fonts:
+  - family: Poppins
+    fonts:
+      - asset: assets/fonts/Poppins-Bold.ttf
+        weight: 900
+      - asset: assets/fonts/Poppins-Medium.ttf
+        weight: 600
+      - asset: assets/fonts/Poppins-Regular.ttf
+        weight: 400
+      - asset: assets/fonts/Poppins-Thin.ttf
+        weight: 200
