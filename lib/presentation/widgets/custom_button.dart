@@ -12,6 +12,7 @@ class CustomButton extends StatelessWidget {
     this.isLoading = false,
     this.backgroundColor = AppColor.tealColorPrimary,
     this.textButtonColor = AppColor.whiteColor,
+    this.enableBorder = false,
   });
 
   final String textButton;
@@ -20,6 +21,7 @@ class CustomButton extends StatelessWidget {
   final Color backgroundColor;
   final Color textButtonColor;
   final bool isLoading;
+  final bool enableBorder;
 
   @override
   Widget build(BuildContext context) {
@@ -33,6 +35,7 @@ class CustomButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: !isLoading ? backgroundColor : AppColor.grayColor,
           borderRadius: BorderRadius.circular(12),
+          border: enableBorder ? Border.all(color: textButtonColor) : null,
         ),
         child: Visibility(
           visible: !isLoading,

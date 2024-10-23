@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/constants/constants.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/localization/app_localization.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/theme/app_color.dart';
@@ -10,6 +9,7 @@ import 'package:flutter_clean_architecture_bloc_template/core/theme/app_theme.da
 import 'package:flutter_clean_architecture_bloc_template/presentation/widgets/custom_button.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/widgets/custom_spacing.dart';
 import 'package:flutter_localization/flutter_localization.dart';
+import 'package:intl/intl.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:smart_snackbars/smart_snackbars.dart';
 
@@ -120,6 +120,23 @@ class Utility {
             ),
           ),
         ));
+  }
+
+  static List<String> convertStringToList(String input,
+      {bool trimWhitespace = true}) {
+    if (trimWhitespace) {
+      return input
+          .split(',')
+          .map((e) => e.trim())
+          .where((e) => e.isNotEmpty)
+          .toList();
+    } else {
+      return input.split(',').where((e) => e.isNotEmpty).toList();
+    }
+  }
+
+  static String formattedDateTime(DateTime dateTime) {
+    return DateFormat('dd/MMM/yyyy').format(dateTime);
   }
 
   static String getKeyValueTranslation(String word) {
@@ -254,5 +271,22 @@ class Utility {
         ),
       );
     }
+  }
+
+  static Color HexToColor(String hexString) {
+    final hex = hexString.replaceAll('#', '');
+
+    if (hex.length == 6) {
+      return Color(int.parse('FF$hex', radix: 16));
+    } else if (hex.length == 8) {
+      return Color(int.parse(hex, radix: 16));
+    } else if (hex.length == 3) {
+      final r = hex[0];
+      final g = hex[1];
+      final b = hex[2];
+      return Color(int.parse('FF$r$r$g$g$b$b', radix: 16));
+    }
+
+    throw FormatException('Invalid hex color format');
   }
 }

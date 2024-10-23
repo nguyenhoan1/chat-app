@@ -11,12 +11,17 @@ class CallApiService {
   Future<T> apiRequest<T>({
     required String url,
     required String method,
-    required T Function(Map<String, dynamic>) fromJson,
+    required T Function(dynamic) fromJson,
     Map<String, dynamic>? params,
     Map<String, dynamic>? headers,
+    String? bearerToken,
   }) async {
     if (kDebugMode) {
       dio.interceptors.add(AppInterceptor());
+    }
+    if (bearerToken != null) {
+      headers = headers ?? {};
+      headers['Authorization'] = 'Bearer $bearerToken';
     }
     try {
       Response response;
