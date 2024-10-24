@@ -7,16 +7,21 @@ import 'package:flutter_clean_architecture_bloc_template/data/data_source/local/
 import 'package:flutter_clean_architecture_bloc_template/data/data_source/remote/auth_remote_source.dart';
 import 'package:flutter_clean_architecture_bloc_template/data/data_source/remote/user_remote_source.dart';
 import 'package:flutter_clean_architecture_bloc_template/data/repositories/authentication/auth_repository_impl.dart';
+import 'package:flutter_clean_architecture_bloc_template/data/repositories/permission/permission_repository_impl.dart';
 import 'package:flutter_clean_architecture_bloc_template/data/repositories/user/user_repository_impl.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/repositories/authentication/auth_repository.dart';
+import 'package:flutter_clean_architecture_bloc_template/domain/repositories/permission/permission_repository.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/repositories/user/user_repository.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/usecase/authentication/login_usecase.dart';
+import 'package:flutter_clean_architecture_bloc_template/domain/usecase/permission/check_permission_usecase.dart';
+import 'package:flutter_clean_architecture_bloc_template/domain/usecase/permission/request_permission_usecase.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/usecase/user/get_profile_usecase.dart';
 import 'package:flutter_clean_architecture_bloc_template/main.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/authentication_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/cubit/change_language/change_language_cubit.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/cubit/password_visible/password_visibility_cubit.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/home/home_bloc.dart';
+import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/permission/permission_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/splash_view/splash_view_cubit.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -31,6 +36,8 @@ Future<void> initLocatorServices() async {
   sl.registerFactory(
     () => SplashViewCubit(sl()),
   );
+
+  sl.registerFactory(() => PermissionHandlerBloc(requestPermissionUseCase: sl(), checkPermissionStatusUseCase: sl()),);
 
   sl.registerFactory(
     () => ChangeLanguageCubit(flutterLocalization: sl()),
@@ -54,6 +61,8 @@ Future<void> initLocatorServices() async {
     () => AuthRepositoryImpl(authRemoteSource: sl()),
   );
 
+  sl.registerLazySingleton<PermissionRepository>(() => PermissionRepositoryImpl(),);
+
   sl.registerLazySingleton<UserRepository>(
     () => UserRepositoryImpl(userRemoteSource: sl()),
   );
@@ -62,6 +71,10 @@ Future<void> initLocatorServices() async {
   sl.registerLazySingleton(
     () => LoginUseCase(authRepository: sl()),
   );
+
+  sl.registerLazySingleton(() => RequestPermissionUseCase(sl()),);
+
+  sl.registerLazySingleton(() => CheckPermissionStatusUseCase(sl()),);
 
   sl.registerLazySingleton(
     () => GetProfileUsecase(userRepository: sl()),

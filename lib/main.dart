@@ -9,6 +9,7 @@ import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/auth
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/cubit/change_language/change_language_cubit.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/cubit/password_visible/password_visibility_cubit.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/home/home_bloc.dart';
+import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/permission/permission_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/splash_view/splash_view_cubit.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
@@ -51,6 +52,11 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
+        BlocProvider<PermissionHandlerBloc>(
+          create: (context) => PermissionHandlerBloc(
+              requestPermissionUseCase: sl(),
+              checkPermissionStatusUseCase: sl()),
+        ),
         BlocProvider(
           create: (context) => AuthenticationBloc(sl(), sl()),
         ),
