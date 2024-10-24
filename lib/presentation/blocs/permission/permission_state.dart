@@ -24,6 +24,19 @@ class PermissionHandlerSuccess extends PermissionHandlerState {
   List<Object> get props => [type, isGranted];
 }
 
+class PermissionHandlerFailed extends PermissionHandlerState {
+  final PermissionType type;
+  final bool isGranted;
+
+  const PermissionHandlerFailed({
+    required this.type,
+    required this.isGranted,
+  });
+
+  @override
+  List<Object> get props => [type, isGranted];
+}
+
 class PermissionHandlerError extends PermissionHandlerState {
   final String message;
 

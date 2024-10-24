@@ -68,19 +68,28 @@ class Utility {
             ),
           );
         case Constants.FAILED:
-          return Icon(
-            Icons.error_outline,
-            color: AppColor.whiteColor,
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Icon(
+              Icons.error_outline,
+              color: AppColor.whiteColor,
+            ),
           );
         case Constants.WARNING:
-          return Icon(
-            Icons.warning_amber_rounded,
-            color: AppColor.whiteColor,
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Icon(
+              Icons.warning_amber_rounded,
+              color: AppColor.whiteColor,
+            ),
           );
         case Constants.ERROR:
-          return Icon(
-            Icons.error,
-            color: AppColor.whiteColor,
+          return Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: Icon(
+              Icons.error,
+              color: AppColor.whiteColor,
+            ),
           );
         default:
           return Icon(

@@ -29,10 +29,17 @@ class PermissionHandlerBloc
     try {
       emit(PermissionHandlerLoading());
       final isGranted = await requestPermissionUseCase.execute(event.type);
-      emit(PermissionHandlerSuccess(
-        type: event.type,
-        isGranted: isGranted,
-      ));
+      if (isGranted) {
+        emit(PermissionHandlerSuccess(
+          type: event.type,
+          isGranted: isGranted,
+        ));
+      } else {
+        emit(PermissionHandlerFailed(
+          type: event.type,
+          isGranted: isGranted,
+        ));
+      }
     } catch (e) {
       emit(PermissionHandlerError(e.toString()));
     }

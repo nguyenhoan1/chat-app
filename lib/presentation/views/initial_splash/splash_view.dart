@@ -48,14 +48,22 @@ class _SplashViewState extends State<SplashView> {
           listener: (context, state) {
             if (state is PermissionHandlerSuccess) {
               Utility.customSnackbar(
-                  message: "Permission ${state.isGranted.toString()}",
-                  typeInfo: Constants.SUCCESS,
-                  context: context);
+                message: "Permission ${state.isGranted.toString()}",
+                typeInfo: Constants.SUCCESS,
+                context: context,
+              );
+            }
+            if (state is PermissionHandlerFailed) {
+              Utility.customSnackbar(
+                message: "Permission ${state.isGranted.toString()}",
+                typeInfo: Constants.WARNING,
+                context: context,
+              );
             }
             if (state is PermissionHandlerError) {
               Utility.customSnackbar(
                   message: state.message,
-                  typeInfo: Constants.FAILED,
+                  typeInfo: Constants.ERROR,
                   context: context);
             }
           },
