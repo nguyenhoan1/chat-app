@@ -1,6 +1,5 @@
 import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:meta/meta.dart';
 
 import '../../../domain/entities/permission/permission_type.dart';
 import '../../../domain/usecase/permission/check_permission_usecase.dart';
@@ -50,14 +49,20 @@ class PermissionHandlerBloc
     Emitter<PermissionHandlerState> emit,
   ) async {
     try {
-      emit(PermissionHandlerLoading());
+      emit(CheckPermissionHandlerLoading());
       final isGranted = await checkPermissionStatusUseCase.execute(event.type);
-      emit(PermissionHandlerSuccess(
-        type: event.type,
-        isGranted: isGranted,
-      ));
+      if (isGranted) {
+        emit(CheckPermissionHandlerSuccess(
+          type: event.type,
+          isGranted: isGranted,
+        ));
+      } else {
+        emit(
+          CheckPermissionHandlerFailed(type: event.type, isGranted: isGranted),
+        );
+      }
     } catch (e) {
-      emit(PermissionHandlerError(e.toString()));
+      emit(CheckPermissionHandlerError(message: e.toString()));
     }
   }
 }

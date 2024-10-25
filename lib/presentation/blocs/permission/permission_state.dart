@@ -11,6 +11,8 @@ class PermissionHandlerInitial extends PermissionHandlerState {}
 
 class PermissionHandlerLoading extends PermissionHandlerState {}
 
+class CheckPermissionHandlerLoading extends PermissionHandlerState {}
+
 class PermissionHandlerSuccess extends PermissionHandlerState {
   final PermissionType type;
   final bool isGranted;
@@ -19,6 +21,16 @@ class PermissionHandlerSuccess extends PermissionHandlerState {
     required this.type,
     required this.isGranted,
   });
+
+  @override
+  List<Object> get props => [type, isGranted];
+}
+
+class CheckPermissionHandlerSuccess extends PermissionHandlerState {
+  final PermissionType type;
+  final bool isGranted;
+
+  CheckPermissionHandlerSuccess({required this.type, required this.isGranted});
 
   @override
   List<Object> get props => [type, isGranted];
@@ -37,11 +49,28 @@ class PermissionHandlerFailed extends PermissionHandlerState {
   List<Object> get props => [type, isGranted];
 }
 
+class CheckPermissionHandlerFailed extends PermissionHandlerState {
+  final PermissionType type;
+  final bool isGranted;
+
+  CheckPermissionHandlerFailed({required this.type, required this.isGranted});
+  @override
+  List<Object> get props => [type, isGranted];
+}
+
 class PermissionHandlerError extends PermissionHandlerState {
   final String message;
 
   const PermissionHandlerError(this.message);
 
+  @override
+  List<Object> get props => [message];
+}
+
+class CheckPermissionHandlerError extends PermissionHandlerState {
+  final String message;
+
+  CheckPermissionHandlerError({required this.message});
   @override
   List<Object> get props => [message];
 }

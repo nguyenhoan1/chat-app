@@ -24,10 +24,6 @@ class _SplashViewState extends State<SplashView> {
     context
         .read<PermissionHandlerBloc>()
         .add(RequestPermissionEvent(PermissionType.camera));
-    Future.delayed(
-      const Duration(seconds: 1),
-      () => context.read<SplashViewCubit>().navigateToNextScreen(),
-    );
   }
 
   @override
@@ -52,6 +48,10 @@ class _SplashViewState extends State<SplashView> {
                 typeInfo: Constants.SUCCESS,
                 context: context,
               );
+              Future.delayed(
+                const Duration(seconds: 1),
+                () => context.read<SplashViewCubit>().navigateToNextScreen(),
+              );
             }
             if (state is PermissionHandlerFailed) {
               Utility.customSnackbar(
@@ -65,6 +65,11 @@ class _SplashViewState extends State<SplashView> {
                   message: state.message,
                   typeInfo: Constants.ERROR,
                   context: context);
+            }
+            if (state is CheckPermissionHandlerFailed) {
+              context
+                  .read<PermissionHandlerBloc>()
+                  .add(RequestPermissionEvent(PermissionType.camera));
             }
           },
         ),
