@@ -32,7 +32,7 @@ class Utility {
   static void configLocalization(void Function(Locale?)? onTranslatedLanguage) {
     _flutterLocalization?.init(
       mapLocales: appLocales,
-      initLanguageCode: Constants.id,
+      initLanguageCode: Constants.vi,
     );
     _flutterLocalization?.onTranslatedLanguage = onTranslatedLanguage;
   }
@@ -155,7 +155,7 @@ class Utility {
     }
     var language = word.split('|');
     return _preferencesHelper!.getStringSync(Constants.languageKey) ==
-            Constants.indonesia
+            Constants.vietnam
         ? language[0]
         : language[1].isEmpty
             ? language[0]

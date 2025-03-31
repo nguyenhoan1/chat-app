@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1059701768947",
+    "project_id": "hipzapp",
+    "storage_bucket": "hipzapp.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1059701768947:android:0a2ab98ad1a953461f6d86",
+        "android_client_info": {
+          "package_name": "com.bagussubagja.flutter_clean_architecture_bloc_template"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCR7SDjNhHlq0kru4s4QsIIGtEnt6Gw3IM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

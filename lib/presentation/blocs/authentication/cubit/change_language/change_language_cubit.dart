@@ -13,7 +13,7 @@ class ChangeLanguageCubit extends Cubit<ChangeLanguageState> {
   void changeLanguage(String key) {
     try {
       flutterLocalization.translate(key);
-      if (key == Constants.id) {
+      if (key == Constants.vi) {
         emit(ChangedLanguagetoIdState());
       } else {
         emit(ChangedLanguagetoEnState());

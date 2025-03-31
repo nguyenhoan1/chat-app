@@ -3,7 +3,7 @@ import 'package:flutter_localization/flutter_localization.dart';
 
 const List<MapLocale> appLocales = [
   MapLocale(Constants.eng, LocaleData.EN),
-  MapLocale(Constants.id, LocaleData.ID),
+  MapLocale(Constants.vi, LocaleData.VI),
 ];
 
 mixin LocaleData {
@@ -40,31 +40,31 @@ mixin LocaleData {
     password: "Password",
     passwordHint: "Your password here...",
     greetingText: "Welcome %a",
-    languageState: "Bahasa yang sedang digunakan adalah %a",
+    languageState: " Your Current Language %a",
     //
     success: "Success",
     failed: "Failed",
     warning: "Warning",
     error: "Error",
   };
-  static const Map<String, dynamic> ID = {
-    version: "Versi %a",
-    versionNotFound: "Versi Tidak Ditemukan",
-    loginTitle: "Halaman Login",
-    loginDesc: "Ini halaman login kamu",
-    loginText: "Masuk",
-    logoutText: "Keluar",
-    email: "Alamat Surel",
-    id: "ID",
-    emailHint: "Masukan alamat surel anda disini...",
-    password: "Kata Sandi",
-    passwordHint: "Masukan kata sandi anda disini...",
-    greetingText: "Selamat datang %a",
-    languageState: "Your Current Language is %a",
+  static const Map<String, dynamic> VI = {
+    "version": "Phiên bản %a",
+    "versionNotFound": "Không tìm thấy phiên bản",
+    "loginTitle": "Trang đăng nhập",
+    "loginDesc": "Đây là trang đăng nhập của bạn",
+    "loginText": "Đăng nhập",
+    "logoutText": "Đăng xuất",
+    "email": "Địa chỉ email",
+    "id": "ID",
+    "emailHint": "Nhập địa chỉ email của bạn ở đây...",
+    "password": "Mật khẩu",
+    "passwordHint": "Nhập mật khẩu của bạn ở đây...",
+    "greetingText": "Chào mừng %a",
+    "languageState": "Ngôn ngữ hiện tại của bạn là %a",
     //
-    success: "Sukses",
-    failed: "Gagal",
-    warning: "Peringatan",
-    error: "Galat",
+    "success": "Thành công",
+    "failed": "Thất bại",
+    "warning": "Cảnh báo",
+    "error": "Lỗi",
   };
 }

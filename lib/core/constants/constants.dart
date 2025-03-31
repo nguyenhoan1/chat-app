@@ -6,11 +6,11 @@ class Constants {
   static const accessTokenKey = "ACCESSTOKENKEY";
   static const refreshTokenKey = "REFRESHTOKENKEY";
   static const languageKey = "LANGUAGEKEY";
-  static const String indonesia = "INDONESIA";
-  static const String id = "id";
+  static const String vietnam = "VIETNAM";
+  static const String vi = "vi";
   static const String english = "ENGLISH";
   static const String eng = "en";
-
+  
   // METHOD REQUEST
   static const GET = "GET";
   static const POST = "POST";

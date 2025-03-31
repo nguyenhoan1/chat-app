@@ -1,3 +1,4 @@
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -5,24 +6,29 @@ import 'package:flutter_clean_architecture_bloc_template/core/router/app_router.
 import 'package:flutter_clean_architecture_bloc_template/core/services/locator_services.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/utility/app_bloc_observer.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/utility/utility.dart';
+import 'package:flutter_clean_architecture_bloc_template/core/utils/app_config.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/authentication_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/cubit/change_language/change_language_cubit.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/authentication/cubit/password_visible/password_visibility_cubit.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/home/home_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/permission/permission_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/presentation/blocs/splash_view/splash_view_cubit.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_localization/flutter_localization.dart';
 import 'package:responsive_sizer/responsive_sizer.dart';
 
-Future<void> main() async {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // uncomment this line to enable bloc observer
+
   if (kDebugMode) {
     Bloc.observer = AppBlocObserver();
   }
+
   await initLocatorServices();
-  await dotenv.load(fileName: ".env");
+  await AppConfig.loadEnv();
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp(options: AppConfig.firebaseOptions);
+  }
+
   runApp(MyApp(
     flutterLocalization: sl(),
   ));
@@ -76,7 +82,7 @@ class _MyAppState extends State<MyApp> {
       child: ResponsiveSizer(
         builder: (context, orientation, screenType) {
           return MaterialApp(
-            title: 'Flutter Clean Architecture Bloc Template',
+            title: 'Our Social Media',
             debugShowCheckedModeBanner: false,
             localizationsDelegates:
                 widget.flutterLocalization.localizationsDelegates,
