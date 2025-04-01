@@ -25,7 +25,7 @@ class CustomTextfield extends StatelessWidget {
     this.onChanged,
     this.isSearchTextField = false,
     this.extraWidget = const SizedBox(),
-    this.useExtraWidget = false,
+    this.useExtraWidget = false, required TextInputType keyboardType, required String? Function(dynamic value) validator,
   }) : super(key: key);
 
   final TextEditingController controller;

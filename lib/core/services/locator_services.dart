@@ -12,6 +12,7 @@ import 'package:flutter_clean_architecture_bloc_template/data/repositories/user/
 import 'package:flutter_clean_architecture_bloc_template/domain/repositories/authentication/auth_repository.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/repositories/permission/permission_repository.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/repositories/user/user_repository.dart';
+import 'package:flutter_clean_architecture_bloc_template/domain/usecase/authentication/%20register_usecase.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/usecase/authentication/login_usecase.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/usecase/permission/check_permission_usecase.dart';
 import 'package:flutter_clean_architecture_bloc_template/domain/usecase/permission/request_permission_usecase.dart';
@@ -68,10 +69,12 @@ Future<void> initLocatorServices() async {
   );
 
   /// USECASE
+  // sl.registerLazySingleton(
+  //   () => LoginUseCase(authRepository: sl()),
+  // );
   sl.registerLazySingleton(
-    () => LoginUseCase(authRepository: sl()),
+    () => RegisterUseCase(authRepository: sl()),
   );
-
   sl.registerLazySingleton(() => RequestPermissionUseCase(sl()),);
 
   sl.registerLazySingleton(() => CheckPermissionStatusUseCase(sl()),);

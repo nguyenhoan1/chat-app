@@ -16,8 +16,8 @@ class AuthLoginResponse extends AuthLoginEntity {
 
   factory AuthLoginResponse.fromJson(Map<String, dynamic> json) =>
       AuthLoginResponse(
-        accessToken: json["access_token"],
-        refreshToken: json["refresh_token"],
+        accessToken: json["access_token"] ?? "",
+        refreshToken: json["refresh_token"] ?? "",
       );
 
   Map<String, dynamic> toJson() => {

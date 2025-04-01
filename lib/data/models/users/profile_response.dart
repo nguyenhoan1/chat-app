@@ -23,7 +23,7 @@ class ProfileResponse extends ProfileEntity {
 
   factory ProfileResponse.fromJson(Map<String, dynamic> json) =>
       ProfileResponse(
-        id: json["id"],
+        id: json["id"] ?? "",
         email: json["email"],
         password: json["password"],
         name: json["name"],

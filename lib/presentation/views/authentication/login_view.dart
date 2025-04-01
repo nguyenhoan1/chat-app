@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/constants/constants.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/localization/app_localization.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/router/app_router.dart';
+import 'package:flutter_clean_architecture_bloc_template/core/services/firebase_auth_service.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/theme/app_color.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/theme/app_theme.dart';
 import 'package:flutter_clean_architecture_bloc_template/core/utility/utility.dart';
@@ -33,10 +34,9 @@ class _LoginViewState extends State<LoginView> {
     _isMounted = false;
     _emailController.dispose();
     _passwordController.dispose();
-    // Xóa tất cả snackbar đang chờ xử lý khi màn hình bị hủy
-    if (mounted) {
-      ScaffoldMessenger.of(context).clearSnackBars();
-    }
+    // if (mounted) {
+    //   ScaffoldMessenger.of(context).clearSnackBars();
+    // }
     super.dispose();
   }
 
@@ -255,6 +255,8 @@ class _LoginViewState extends State<LoginView> {
                               hintText: LocaleData.emailHint.getString(context),
                               prefixIcon: const Icon(Icons.email_outlined,
                                   color: Colors.blue),
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (value) {},
                             ),
                             const VerticalSpacing(height: 20),
                             BlocBuilder<PasswordVisibilityCubit,
@@ -271,6 +273,8 @@ class _LoginViewState extends State<LoginView> {
                                     LocaleData.passwordHint.getString(context),
                                 prefixIcon: const Icon(Icons.lock_outline,
                                     color: Colors.blue),
+                                keyboardType: TextInputType.visiblePassword,
+                                validator: (value) {},
                               ),
                             ),
                             Align(
@@ -346,12 +350,13 @@ class _LoginViewState extends State<LoginView> {
                         children: [
                           Text(
                             "Don't have an account?",
-                            style: TextStyle(
-                              color: Colors.grey.shade700,
-                            ),
+                            style: TextStyle(color: Colors.grey.shade700),
                           ),
                           TextButton(
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushNamed(
+                                  context, AppRouter.registerView);
+                            },
                             child: Text(
                               'Sign Up',
                               style: TextStyle(
@@ -361,6 +366,47 @@ class _LoginViewState extends State<LoginView> {
                             ),
                           ),
                         ],
+                      ),
+                      const SizedBox(height: 16),
+
+                      Text(
+                        "OR",
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+
+                      const SizedBox(height: 10),
+
+                      /// ✅ Tách riêng ra để tránh lỗi layout
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          icon: const Icon(Icons.g_mobiledata, size: 30),
+                          label: const Text('Sign in with Google'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.white,
+                            foregroundColor: Colors.black,
+                            padding: const EdgeInsets.symmetric(vertical: 12),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10),
+                              side: BorderSide(color: Colors.grey.shade300),
+                            ),
+                          ),
+                          onPressed: () async {
+                            try {
+                              final user = await FirebaseAuthService()
+                                  .signInWithGoogle();
+                              if (user != null) {
+                                Navigator.pushNamedAndRemoveUntil(
+                                  context,
+                                  AppRouter.homeView,
+                                  (route) => false,
+                                );
+                              }
+                            } catch (e) {
+                              _showAlertDialogIfMounted(e.toString());
+                            }
+                          },
+                        ),
                       ),
                       const SizedBox(height: 40),
                       FutureBuilder(

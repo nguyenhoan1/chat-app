@@ -224,7 +224,9 @@ class Utility {
                         style: AppTheme.paragraph1,
                       ),
                       Text(
-                        responseMessage[1],
+                        responseMessage[0]!.contains('Success')
+                            ? responseMessage[1]
+                            : responseMessage[0],
                         style: AppTheme.paragraph2.copyWith(
                           color: AppColor.grayColor,
                         ),

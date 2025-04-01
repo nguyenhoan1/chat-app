@@ -28,3 +28,16 @@ class AuthLoginFailedState extends AuthenticationState {
   const AuthLoginFailedState(
       {required this.errorMessage, required super.isLoading});
 }
+
+class AuthRegisterSuccessState extends AuthenticationState {
+  const AuthRegisterSuccessState({required super.isLoading});
+}
+
+class AuthRegisterFailedState extends AuthenticationState {
+  final String  errorMessage;
+
+  const AuthRegisterFailedState({
+    required this.errorMessage,
+    required super.isLoading,
+  });
+}

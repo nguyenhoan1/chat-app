@@ -8,3 +8,10 @@ class AuthenticationLoginEvent extends AuthenticationEvent {
 
   AuthenticationLoginEvent({required this.params});
 }
+
+
+class AuthenticationRegisterEvent extends AuthenticationEvent {
+  final AuthRegisterParams params;
+
+  AuthenticationRegisterEvent({required this.params});
+}

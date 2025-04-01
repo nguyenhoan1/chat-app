@@ -1,6 +1,7 @@
 class Constants {
-  static const loginUrl = "https://api.escuelajs.co/api/v1/auth/login";
-  static const getProfileUser = "https://api.escuelajs.co/api/v1/auth/profile";
+
+  static const registerUrl = "https://reqres.in/api/register";
+  static const getProfileUser = "https://reqres.in/api/users/2";
 
   // KEY
   static const accessTokenKey = "ACCESSTOKENKEY";
