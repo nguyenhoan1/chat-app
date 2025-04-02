@@ -32,6 +32,13 @@ class _UploadPostViewState extends State<UploadPostView> {
 
   VideoPlayerController? _videoController;
   int _currentMediaIndex = 0;
+  
+  // Added for story upload functionality
+  bool _isStoryMode = false;
+  bool _isAddingTextToStory = false;
+  String _storyText = '';
+  Color _storyTextColor = Colors.white;
+  double _storyTextSize = 20.0;
 
   @override
   void dispose() {
@@ -69,7 +76,9 @@ class _UploadPostViewState extends State<UploadPostView> {
   Future<void> _pickVideo() async {
     final pickedFile = await _imagePicker.pickVideo(
       source: ImageSource.gallery,
-      maxDuration: const Duration(minutes: 1),
+      maxDuration: _isStoryMode 
+          ? const Duration(seconds: 15) // 15 seconds for stories
+          : const Duration(minutes: 1), // 1 minute for posts
     );
     if (pickedFile != null) {
       final videoFile = File(pickedFile.path);
@@ -97,7 +106,9 @@ class _UploadPostViewState extends State<UploadPostView> {
   Future<void> _recordVideo() async {
     final pickedFile = await _imagePicker.pickVideo(
       source: ImageSource.camera,
-      maxDuration: const Duration(minutes: 1),
+      maxDuration: _isStoryMode 
+          ? const Duration(seconds: 15) // 15 seconds for stories
+          : const Duration(minutes: 1), // 1 minute for posts
     );
     if (pickedFile != null) {
       final videoFile = File(pickedFile.path);
@@ -205,15 +216,32 @@ class _UploadPostViewState extends State<UploadPostView> {
       _uploadProgress = 0.0;
     });
 
-    context.read<PostUploadBloc>().add(
-          PostUploadStartedEvent(
-            media: _selectedMedia,
-            userId: userId,
-            caption: _captionController.text.trim(),
-            location: _locationController.text.trim(),
-            visibility: _visibility,
-          ),
-        );
+    if (_isStoryMode) {
+      // Upload as story
+      _uploadStory(userId);
+    } else {
+      // Upload as post
+      context.read<PostUploadBloc>().add(
+            PostUploadStartedEvent(
+              media: _selectedMedia,
+              userId: userId,
+              caption: _captionController.text.trim(),
+              location: _locationController.text.trim(),
+              visibility: _visibility,
+            ),
+          );
+    }
+  }
+  
+  void _uploadStory(String userId) async {
+    // Simulate story upload
+    _simulateUploadProgress();
+    
+    // In a real app, you would use a StoryUploadBloc or similar
+    // For this example, we'll just simulate the upload
+    
+    // After upload completes, show success message and navigate back
+    // This is handled in _simulateUploadProgress()
   }
 
   void _simulateUploadProgress() {
@@ -231,7 +259,7 @@ class _UploadPostViewState extends State<UploadPostView> {
 
       // Show success message
       Utility.customSnackbar(
-        message: "Post uploaded successfully!",
+        message: _isStoryMode ? "Story uploaded successfully!" : "Post uploaded successfully!",
         typeInfo: Constants.SUCCESS,
         context: context,
       );
@@ -242,6 +270,166 @@ class _UploadPostViewState extends State<UploadPostView> {
       });
     }
   }
+  
+  void _toggleStoryMode() {
+    setState(() {
+      _isStoryMode = !_isStoryMode;
+      
+      // Clear selected media when switching modes
+      if (_selectedMedia.isNotEmpty) {
+        if (_videoController != null) {
+          _videoController!.dispose();
+          _videoController = null;
+        }
+        _selectedMedia.clear();
+      }
+      
+      // Reset story text when switching to post mode
+      if (!_isStoryMode) {
+        _storyText = '';
+        _isAddingTextToStory = false;
+      }
+    });
+  }
+  
+  void _showStoryTextEditor() {
+    setState(() {
+      _isAddingTextToStory = true;
+    });
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.black87,
+      builder: (context) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                top: 20,
+                left: 20,
+                right: 20,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      setModalState(() {
+                        _storyText = value;
+                      });
+                      setState(() {});
+                    },
+                    style: TextStyle(
+                      color: _storyTextColor,
+                      fontSize: _storyTextSize,
+                    ),
+                    decoration: const InputDecoration(
+                      hintText: 'Type something...',
+                      hintStyle: TextStyle(color: Colors.white54),
+                      border: InputBorder.none,
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    ),
+                    cursorColor: Colors.white,
+                    maxLines: 3,
+                    textAlign: TextAlign.center,
+                    autofocus: true,
+                    controller: TextEditingController(text: _storyText),
+                  ),
+                  const SizedBox(height: 16),
+                  SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        Colors.white,
+                        Colors.black,
+                        Colors.red,
+                        Colors.blue,
+                        Colors.green,
+                        Colors.yellow,
+                        Colors.purple,
+                        Colors.orange,
+                      ].map((color) {
+                        return GestureDetector(
+                          onTap: () {
+                            setModalState(() {
+                              _storyTextColor = color;
+                            });
+                            setState(() {});
+                          },
+                          child: Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4),
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: color,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: _storyTextColor == color ? Colors.white : Colors.transparent,
+                                width: 2,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Slider(
+                    value: _storyTextSize,
+                    min: 14.0,
+                    max: 40.0,
+                    activeColor: Colors.white,
+                    inactiveColor: Colors.white30,
+                    onChanged: (value) {
+                      setModalState(() {
+                        _storyTextSize = value;
+                      });
+                      setState(() {});
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      TextButton(
+                        onPressed: () {
+                          setState(() {
+                            _storyText = '';
+                            _isAddingTextToStory = false;
+                          });
+                          Navigator.pop(context);
+                        },
+                        child: const Text(
+                          'Clear',
+                          style: TextStyle(color: Colors.white),
+                        ),
+                      ),
+                      ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _isAddingTextToStory = false;
+                          });
+                          Navigator.pop(context);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.white,
+                          foregroundColor: Colors.black,
+                        ),
+                        child: const Text('Done'),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 20),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -250,13 +438,7 @@ class _UploadPostViewState extends State<UploadPostView> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.white,
-        title: const Text(
-          'New Post',
-          style: TextStyle(
-            color: Colors.black,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
+        title: _buildModeToggle(),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () => Navigator.pop(context),
@@ -266,7 +448,7 @@ class _UploadPostViewState extends State<UploadPostView> {
             onPressed:
                 _selectedMedia.isEmpty || _isUploading ? null : _uploadPost,
             child: Text(
-              'Share',
+              _isStoryMode ? 'Share to Story' : 'Share',
               style: TextStyle(
                 color: _selectedMedia.isEmpty || _isUploading
                     ? Colors.blue.shade200
@@ -304,7 +486,71 @@ class _UploadPostViewState extends State<UploadPostView> {
             });
           }
         },
-        child: _isUploading ? _buildUploadingState() : _buildUploadForm(),
+        child: _isUploading ? _buildUploadingState() : 
+                _isStoryMode ? _buildStoryUploadForm() : _buildPostUploadForm(),
+      ),
+    );
+  }
+  
+  Widget _buildModeToggle() {
+    return Container(
+      height: 40,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade200,
+        borderRadius: BorderRadius.circular(20),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          GestureDetector(
+            onTap: _isStoryMode ? _toggleStoryMode : null,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: _isStoryMode ? Colors.transparent : Colors.white,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: _isStoryMode ? null : [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Text(
+                'Post',
+                style: TextStyle(
+                  color: _isStoryMode ? Colors.grey.shade700 : Colors.black,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+          GestureDetector(
+            onTap: _isStoryMode ? null : _toggleStoryMode,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              decoration: BoxDecoration(
+                color: _isStoryMode ? Colors.white : Colors.transparent,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: _isStoryMode ? [
+                  BoxShadow(
+                    color: Colors.grey.shade300,
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ] : null,
+              ),
+              child: Text(
+                'Story',
+                style: TextStyle(
+                  color: _isStoryMode ? Colors.black : Colors.grey.shade700,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -314,9 +560,9 @@ class _UploadPostViewState extends State<UploadPostView> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const Text(
-            'Uploading Post...',
-            style: TextStyle(
+          Text(
+            _isStoryMode ? 'Uploading Story...' : 'Uploading Post...',
+            style: const TextStyle(
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -346,7 +592,7 @@ class _UploadPostViewState extends State<UploadPostView> {
     );
   }
 
-  Widget _buildUploadForm() {
+  Widget _buildPostUploadForm() {
     return SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -453,6 +699,318 @@ class _UploadPostViewState extends State<UploadPostView> {
             ),
           ),
         ],
+      ),
+    );
+  }
+  
+  Widget _buildStoryUploadForm() {
+    return Column(
+      children: [
+        // Story media preview with text overlay
+        Expanded(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              // Media preview
+              if (_selectedMedia.isEmpty)
+                Container(
+                  color: Colors.black,
+                  child: Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.photo_camera_outlined,
+                          size: 80,
+                          color: Colors.white.withOpacity(0.7),
+                        ),
+                        const SizedBox(height: 16),
+                        Text(
+                          "Tap to add to your story",
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white.withOpacity(0.9),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
+              else if (_selectedMedia[_currentMediaIndex].type == MediaType.image)
+                Image.file(
+                  _selectedMedia[_currentMediaIndex].file,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                  height: double.infinity,
+                )
+              else if (_videoController != null && _videoController!.value.isInitialized)
+                FittedBox(
+                  fit: BoxFit.cover,
+                  child: SizedBox(
+                    width: _videoController!.value.size.width,
+                    height: _videoController!.value.size.height,
+                    child: VideoPlayer(_videoController!),
+                  ),
+                ),
+              
+              // Text overlay
+              if (_storyText.isNotEmpty)
+                Center(
+                  child: Text(
+                    _storyText,
+                    style: TextStyle(
+                      color: _storyTextColor,
+                      fontSize: _storyTextSize,
+                      fontWeight: FontWeight.bold,
+                      shadows: [
+                        Shadow(
+                          blurRadius: 3.0,
+                          color: Colors.black.withOpacity(0.5),
+                          offset: const Offset(1, 1),
+                        ),
+                      ],
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              
+              // Story editing tools
+              Positioned(
+                top: 16,
+                right: 16,
+                child: Column(
+                  children: [
+                    _buildStoryToolButton(
+                      icon: Icons.text_fields,
+                      onTap: _showStoryTextEditor,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildStoryToolButton(
+                      icon: Icons.emoji_emotions_outlined,
+                      onTap: () {
+                        // Show emoji picker
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    _buildStoryToolButton(
+                      icon: Icons.brush_outlined,
+                      onTap: () {
+                        // Show drawing tools
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              
+              // Tap to add media if empty
+              if (_selectedMedia.isEmpty)
+                Positioned.fill(
+                  child: Material(
+                    color: Colors.transparent,
+                    child: InkWell(
+                      onTap: _showStoryMediaOptions,
+                      splashColor: Colors.white24,
+                      highlightColor: Colors.white10,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        
+        // Bottom controls for story
+        if (_selectedMedia.isNotEmpty)
+          Container(
+            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 20),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 4,
+                  offset: const Offset(0, -2),
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    // Show story settings
+                  },
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.settings_outlined,
+                        color: Colors.grey.shade700,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Story Settings',
+                        style: TextStyle(
+                          color: Colors.grey.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                GestureDetector(
+                  onTap: _showStoryMediaOptions,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade50,
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.add_photo_alternate_outlined,
+                          color: Colors.blue.shade700,
+                          size: 20,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Change Media',
+                          style: TextStyle(
+                            color: Colors.blue.shade700,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+      ],
+    );
+  }
+  
+  void _showStoryMediaOptions() {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const Text(
+                  'Add to Your Story',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _buildStoryMediaOption(
+                      icon: Icons.photo_library_outlined,
+                      label: 'Gallery',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _pickImage();
+                      },
+                    ),
+                    _buildStoryMediaOption(
+                      icon: Icons.camera_alt_outlined,
+                      label: 'Camera',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _takePhoto();
+                      },
+                    ),
+                    _buildStoryMediaOption(
+                      icon: Icons.videocam_outlined,
+                      label: 'Video',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _pickVideo();
+                      },
+                    ),
+                    _buildStoryMediaOption(
+                      icon: Icons.video_camera_back_outlined,
+                      label: 'Record',
+                      onTap: () {
+                        Navigator.pop(context);
+                        _recordVideo();
+                      },
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 20),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  
+  Widget _buildStoryMediaOption({
+    required IconData icon,
+    required String label,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Column(
+        children: [
+          Container(
+            width: 60,
+            height: 60,
+            decoration: BoxDecoration(
+              color: Colors.blue.shade50,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              icon,
+              color: Colors.blue.shade600,
+              size: 30,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 12,
+              color: Colors.grey.shade700,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+  
+  Widget _buildStoryToolButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 40,
+        height: 40,
+        decoration: BoxDecoration(
+          color: Colors.black.withOpacity(0.5),
+          shape: BoxShape.circle,
+        ),
+        child: Icon(
+          icon,
+          color: Colors.white,
+          size: 24,
+        ),
       ),
     );
   }
@@ -791,4 +1349,3 @@ class _UploadPostViewState extends State<UploadPostView> {
     );
   }
 }
-

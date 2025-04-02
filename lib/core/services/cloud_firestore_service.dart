@@ -4,6 +4,8 @@ import 'package:flutter_clean_architecture_bloc_template/core/services/cloudinar
 import 'package:flutter_clean_architecture_bloc_template/data/models/upload_post/upload_post_model.dart';
 import 'package:uuid/uuid.dart';
 
+import '../../data/models/upload_stories/upload_stories_model.dart';
+
 Future<void> uploadMultipleMediaAsOnePost({
   required List<File> mediaFiles,
   required String userId,
@@ -47,4 +49,16 @@ Future<void> uploadMultipleMediaAsOnePost({
 Future<Map<String, dynamic>?> getUserInfo(String uid) async {
   final doc = await FirebaseFirestore.instance.collection('users').doc(uid).get();
   return doc.exists ? doc.data() : null;
+}
+Future<void> uploadStory(Story story) async {
+  try {
+    await FirebaseFirestore.instance
+        .collection('stories')
+        .doc(story.id)
+        .set(story.toJson());
+    print('✅ Story uploaded successfully');
+  } catch (e) {
+    print('🔥 Error uploading story: $e');
+    rethrow;
+  }
 }

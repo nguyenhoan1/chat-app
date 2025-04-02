@@ -19,45 +19,6 @@ class HomeView extends StatefulWidget {
 
 class _HomeViewState extends State<HomeView> {
   int _selectedIndex = 0;
-
-  final List<Map<String, dynamic>> _stories = [
-    {
-      'username': 'Your Story',
-      'imageUrl': 'assets/images/avatar1.png',
-      'isViewed': false,
-      'isYourStory': true,
-    },
-    {
-      'username': 'john_doe',
-      'imageUrl': 'assets/images/avatar2.png',
-      'isViewed': false,
-      'isYourStory': false,
-    },
-    {
-      'username': 'jane_smith',
-      'imageUrl': 'assets/images/avatar3.png',
-      'isViewed': false,
-      'isYourStory': false,
-    },
-    {
-      'username': 'robert_j',
-      'imageUrl': 'assets/images/avatar4.png',
-      'isViewed': true,
-      'isYourStory': false,
-    },
-    {
-      'username': 'emma_w',
-      'imageUrl': 'assets/images/avatar5.png',
-      'isViewed': true,
-      'isYourStory': false,
-    },
-    {
-      'username': 'michael_b',
-      'imageUrl': 'assets/images/avatar6.png',
-      'isViewed': false,
-      'isYourStory': false,
-    },
-  ];
   VideoPlayerController? _videoController;
 
   Future<void> _initializeVideoController(String videoUrl) async {
@@ -251,31 +212,54 @@ void dispose() {
     );
   }
 
-  Widget _buildStories() {
-    return Container(
-      height: 115,
-      padding: const EdgeInsets.symmetric(vertical: 10),
-      child: ListView.builder(
-        scrollDirection: Axis.horizontal,
-        itemCount: _stories.length,
-        itemBuilder: (context, index) {
-          final story = _stories[index];
-          return Container(
-            margin: const EdgeInsets.symmetric(horizontal: 8),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Stack(
-                  alignment: Alignment.center,
-                  children: [
-                    Container(
-                      width: 68,
-                      height: 68,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        gradient: story['isViewed']
-                            ? null
-                            : const LinearGradient(
+ Widget _buildStories() {
+  return SizedBox(
+    height: 115,
+    child: StreamBuilder<QuerySnapshot>(
+      stream: FirebaseFirestore.instance
+          .collection('stories')
+          .where('expireAt', isGreaterThan: Timestamp.now()) 
+          .orderBy('createdAt', descending: true)
+          .snapshots(),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+
+        final storiesDocs = snapshot.data!.docs;
+
+        return ListView.builder(
+          scrollDirection: Axis.horizontal,
+          itemCount: storiesDocs.length,
+          itemBuilder: (context, index) {
+            final storyData = storiesDocs[index].data() as Map<String, dynamic>;
+            final userId = storyData['userId'] ?? '';
+
+            return FutureBuilder<DocumentSnapshot>(
+              future: FirebaseFirestore.instance.collection('users').doc(userId).get(),
+              builder: (context, userSnapshot) {
+                if (!userSnapshot.hasData) {
+                  return const SizedBox.shrink();
+                }
+
+                final userData = userSnapshot.data!.data() as Map<String, dynamic>?;
+                final username = userData?['displayName'] ?? 'Unknown';
+                final photoUrl = userData?['photoUrl'] ?? '';
+
+                return Container(
+                  margin: const EdgeInsets.symmetric(horizontal: 8),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Stack(
+                        alignment: Alignment.center,
+                        children: [
+                          Container(
+                            width: 68,
+                            height: 68,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              gradient: const LinearGradient(
                                 colors: [
                                   Colors.purple,
                                   Colors.orange,
@@ -284,48 +268,51 @@ void dispose() {
                                 begin: Alignment.topLeft,
                                 end: Alignment.bottomRight,
                               ),
-                        color: story['isViewed'] ? Colors.grey.shade300 : null,
-                      ),
-                    ),
-                    Container(
-                      width: 64,
-                      height: 64,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: Colors.white,
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(2),
-                        child: CircleAvatar(
-                          backgroundImage: AssetImage(
-                            story['imageUrl'] ??
-                                'assets/images/default_avatar.png',
+                            ),
                           ),
+                          Container(
+                            width: 64,
+                            height: 64,
+                            decoration: const BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.white,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(2),
+                              child: CircleAvatar(
+                                backgroundImage: photoUrl.isNotEmpty
+                                    ? NetworkImage(photoUrl)
+                                    : const AssetImage('assets/images/default_avatar.png') as ImageProvider,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 4),
+                      SizedBox(
+                        width: 70,
+                        child: Text(
+                          username,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.black87,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.center,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 4),
-                Expanded(
-                  child: Text(
-                    story['username'],
-                    style: const TextStyle(
-                      fontSize: 12,
-                      color: Colors.black87,
-                    ),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    textAlign: TextAlign.center,
+                    ],
                   ),
-                ),
-              ],
-            ),
-          );
-        },
-      ),
-    );
-  }
+                );
+              },
+            );
+          },
+        );
+      },
+    ),
+  );
+}
 
   Widget _buildpostItem(Map<String, dynamic> post) {
     final String userId = post['userId'];
