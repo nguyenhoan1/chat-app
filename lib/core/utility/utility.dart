@@ -300,4 +300,6 @@ class Utility {
 
     throw FormatException('Invalid hex color format');
   }
+
+  
 }
